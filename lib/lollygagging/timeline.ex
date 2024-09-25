@@ -59,7 +59,6 @@ defmodule Lollygagging.Timeline do
     %Post{}
     |> Post.changeset(attrs)
     |> Repo.insert()
-    |> broadcast(:post_created)
   end
 
   @doc """
@@ -121,9 +120,7 @@ defmodule Lollygagging.Timeline do
 
   def subscribe, do: Phoenix.PubSub.subscribe(Lollygagging.PubSub, "posts")
 
-  defp broadcast({:error, _reason} = error, _event), do: error
-
-  defp broadcast({:ok, post}, event) do
+  def broadcast(post, event) do
     Phoenix.PubSub.broadcast(Lollygagging.PubSub, "posts", {event, post})
     {:ok, post}
   end

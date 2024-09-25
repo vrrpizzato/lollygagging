@@ -1,17 +1,36 @@
-<div class="flex items-center justify-center">
-  <.link patch={~p"/posts/new"}>
-    <button
-      type="button"
-      class="text-white bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+<div id="timezone-hook" phx-hook="TimezoneHook">
+  <div class="flex items-center justify-center">
+    <.link patch={~p"/posts/new"}>
+      <button
+        type="button"
+        class="text-white bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+      >
+        New Post
+      </button>
+    </.link>
+  </div>
+  <div id="posts" phx-update="stream">
+    <div
+      :for={{dom_id, post} <- @streams.posts}
+      id={dom_id}
+      class="post box-border min-h-32 min-w-48"
     >
-      New Post
-    </button>
-  </.link>
-</div>
-<div id="posts">
-  <%= for {id, post} <- @streams.posts do %>
-    <.live_component module={LollygaggingWeb.PostLive.PostComponent} id={id} post={post} />
-  <% end %>
+      <div class="flex gap-2.5">
+        <div class="flex flex-col w-full max-w-[px] leading-1.5 p-4 rounded-3xl border-gray-200 bg-gray-100">
+          <div class="flex items-center space-x-2 rtl:space-x-reverse">
+            <span class="text-base font-semibold text-gray-900">@<%= post.username %></span>
+          </div>
+          <p class="text-base font-normal py-2.5 text-gray-900"><%= post.body %></p>
+
+          <div class="flex items-end text-end ">
+            <span class="text-sm font-normal text-gray-500 dark:text-gray-400">
+              <%= format_timestamp(post.inserted_at) %>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <.modal :if={@live_action in [:new, :edit]} id="post-modal" show on_cancel={JS.patch(~p"/")}>

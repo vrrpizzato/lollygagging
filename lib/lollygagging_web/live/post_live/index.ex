@@ -7,7 +7,9 @@ defmodule LollygaggingWeb.PostLive.Index do
   @impl true
   def mount(_params, _session, socket) do
     if connected?(socket), do: Timeline.subscribe()
-    {:ok, stream(socket, :posts, list_posts())}
+
+    {:ok,
+     socket |> assign(:client_timezone, nil) |> stream(:posts, list_posts(), at: 0, limit: 10)}
   end
 
   @impl true
@@ -35,12 +37,17 @@ defmodule LollygaggingWeb.PostLive.Index do
 
   @impl true
   def handle_info({:post_created, post}, socket) do
-    {:noreply, stream_insert(socket, :posts, post, at: 0)}
+    {:noreply, stream_insert(socket, :posts, post, at: 0, limit: 10)}
   end
 
   @impl true
   def handle_info({:post_updated, post}, socket) do
     {:noreply, socket |> stream_delete(:posts, post)}
+  end
+
+  @impl true
+  def handle_event("client_timezone", %{"timezone" => timezone}, socket) do
+    {:noreply, assign(socket, :client_timezone, timezone)}
   end
 
   @impl true
@@ -53,5 +60,21 @@ defmodule LollygaggingWeb.PostLive.Index do
 
   defp list_posts do
     Timeline.list_posts(:desc)
+  end
+
+  defp format_timestamp(timestamp) do
+    date =
+      timestamp
+      |> DateTime.to_date()
+      |> Date.to_string()
+
+    time =
+      timestamp
+      # |> DateTime.shift_zone!(client_timezone)
+      |> DateTime.to_time()
+      |> Time.to_string()
+      |> String.replace(~r/:([0-9]{2})$/, "")
+
+    "#{date} #{time}"
   end
 end

@@ -59,7 +59,9 @@ defmodule LollygaggingWeb.PostLive.FormComponent do
 
   defp save_post(socket, :new, post_params) do
     case Timeline.create_post(post_params) do
-      {:ok, _post} ->
+      {:ok, post} ->
+        Timeline.broadcast(post, :post_created)
+
         {:noreply,
          socket
          |> put_flash(:info, "Post created successfully")
