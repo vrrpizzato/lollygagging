@@ -6,10 +6,17 @@ defmodule LollygaggingWeb.PostLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    if connected?(socket), do: Timeline.subscribe()
+    if connected?(socket) do
+      Timeline.subscribe()
+      push_event(socket, "TimezoneHook", %{})
+    end
 
-    {:ok,
-     socket |> assign(:client_timezone, nil) |> stream(:posts, list_posts(), at: 0, limit: 10)}
+    socket =
+      socket
+      |> assign(:client_timezone, nil)
+      |> stream(:posts, [], at: 0, limit: 10)
+
+    {:ok, socket}
   end
 
   @impl true
@@ -37,7 +44,7 @@ defmodule LollygaggingWeb.PostLive.Index do
 
   @impl true
   def handle_info({:post_created, post}, socket) do
-    {:noreply, stream_insert(socket, :posts, post, at: 0, limit: 10)}
+    {:noreply, stream_insert(socket, :posts, post, at: 0, limit: 20)}
   end
 
   @impl true
@@ -54,8 +61,13 @@ defmodule LollygaggingWeb.PostLive.Index do
   end
 
   @impl true
-  def handle_event("client_timezone", %{"timezone" => timezone}, socket) do
-    {:noreply, assign(socket, :client_timezone, timezone)}
+  def handle_event("fetched_client_timezone", %{"timezone" => timezone}, socket) do
+    socket =
+      socket
+      |> assign(:client_timezone, timezone)
+      |> stream(:posts, list_posts(), reset: true, at: 0, limit: 20)
+
+    {:noreply, socket}
   end
 
   @impl true
@@ -68,17 +80,19 @@ defmodule LollygaggingWeb.PostLive.Index do
 
   defp list_posts do
     Timeline.list_posts(:desc)
+    |> Enum.reverse()
   end
 
-  defp format_timestamp(timestamp) do
+  defp format_timestamp(timestamp, client_timezone) do
+    updated_timestamp = DateTime.shift_zone!(timestamp, client_timezone)
+
     date =
-      timestamp
+      updated_timestamp
       |> DateTime.to_date()
       |> Date.to_string()
 
     time =
-      timestamp
-      # |> DateTime.shift_zone!(client_timezone)
+      updated_timestamp
       |> DateTime.to_time()
       |> Time.to_string()
       |> String.replace(~r/:([0-9]{2})$/, "")
