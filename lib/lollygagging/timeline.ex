@@ -23,7 +23,7 @@ defmodule Lollygagging.Timeline do
   def list_posts(order) do
     Post
     |> order_by([p], [{^order, :inserted_at}])
-    |> limit([p], 10)
+    |> limit([p], 20)
     |> Repo.all()
   end
 

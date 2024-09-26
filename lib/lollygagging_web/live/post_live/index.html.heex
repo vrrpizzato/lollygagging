@@ -1,4 +1,4 @@
-<div id="timezone-hook" phx-hook="TimezoneHook">
+<div id="timezone-hook" phx-hook="ClientTimezoneHook">
   <div class="flex items-center justify-center">
     <.link patch={~p"/posts/new"}>
       <button
@@ -44,7 +44,7 @@
             </div>
             <div class="flex col-span-2 items-end text-end place-self-end">
               <span class="text-sm font-normal text-gray-500 dark:text-gray-400">
-                <%= format_timestamp(post.inserted_at) %>
+                <%= format_timestamp(post.inserted_at, @client_timezone) %>
               </span>
             </div>
           </div>

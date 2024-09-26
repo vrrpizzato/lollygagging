@@ -1,9 +1,9 @@
 let Hooks = {};
 
-Hooks.TimezoneHook = {
+Hooks.ClientTimezoneHook = {
   mounted() {
     const clientTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    this.pushEvent("client_timezone", { timezone: clientTimezone });
+    this.pushEvent("fetched_client_timezone", { timezone: clientTimezone });
   }
 }
 
