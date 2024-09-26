@@ -4,14 +4,45 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content={get_csrf_token()} />
-    <.live_title suffix=" · Phoenix Framework">
-      <%= assigns[:page_title] || "Lollygagging" %>
+    <.live_title suffix=" · Lollygagging">
+      <%= assigns[:page_title] || "" %>
     </.live_title>
     <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
     <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
     </script>
   </head>
-  <body class="bg-white">
-    <%= @inner_content %>
+  <body class="bg-white pl-[calc(100vw-100%)] text-black antialiased dark:bg-gray-950 dark:text-white">
+    <section class="mx-auto max-w-3xl px-4 sm:px-6 xl:max-w-5xl xl:px-0">
+      <main class="mb-auto">
+        <div class="divide-y divide-gray-200 dark:divide-gray-700">
+          <div class="space-y-2 pb-8 pt-6 md:space-y-5">
+            <div class="place-items-center grid grid-cols-3 gap-4">
+              <div>
+                <img
+                  src={~p"/images/logo.png"}
+                  class="h-auto max-h-32 max-w-lg transition-all duration-300 rounded-lg cursor-pointer filter grayscale hover:grayscale-0"
+                  alt="image description"
+                />
+              </div>
+              <div>
+                <h1 class="text-center text-3xl font-extrabold leading-9 tracking-tight text-gray-900 dark:text-gray-100 sm:text-4xl sm:leading-10 md:text-6xl md:leading-14">
+                  Lollygagging
+                </h1>
+              </div>
+              <div>
+                <img
+                  src={~p"/images/logo.png"}
+                  class="h-auto max-h-32 max-w-lg transition-all duration-300 rounded-lg cursor-pointer filter grayscale hover:grayscale-0"
+                  alt="image description"
+                />
+              </div>
+            </div>
+            <p class="text-lg leading-7 text-gray-500 dark:text-gray-400"></p>
+          </div>
+        </div>
+        <%= @inner_content %>
+      </main>
+      <footer></footer>
+    </section>
   </body>
 </html>
