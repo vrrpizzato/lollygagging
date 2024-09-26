@@ -42,7 +42,15 @@ defmodule LollygaggingWeb.PostLive.Index do
 
   @impl true
   def handle_info({:post_updated, post}, socket) do
-    {:noreply, socket |> stream_delete(:posts, post)}
+    {:noreply, socket |> stream_insert(:posts, post, at: -1)}
+  end
+
+  @impl true
+  def handle_event("liked", %{"id" => id}, socket) do
+    {:ok, post} = Timeline.inc_likes(id)
+    Timeline.broadcast(post, :post_updated)
+
+    {:noreply, socket}
   end
 
   @impl true
