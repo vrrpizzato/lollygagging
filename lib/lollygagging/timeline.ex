@@ -108,14 +108,14 @@ defmodule Lollygagging.Timeline do
     Post.changeset(post, attrs)
   end
 
-  def inc_likes(%Post{id: id}) do
+  def inc_likes(id) do
     {_, [post]} =
       Post
       |> where([p], p.id == ^id)
       |> select([p], p)
       |> Repo.update_all(inc: [likes_count: 1])
 
-    broadcast({:ok, post}, :post_updated)
+    {:ok, post}
   end
 
   def subscribe, do: Phoenix.PubSub.subscribe(Lollygagging.PubSub, "posts")
