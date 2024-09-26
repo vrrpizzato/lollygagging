@@ -15,6 +15,20 @@ module.exports = {
     extend: {
       colors: {
         brand: "#FD4F00",
+      },
+      keyframes: {
+        "wiggle-left": {
+          '0%, 100%': { transform: 'rotate(-3deg)' },
+          '50%': { transform: 'rotate(3deg)' },
+        },
+        "wiggle-right": {
+          '0%, 100%': { transform: 'rotate(3deg)' },
+          '50%': { transform: 'rotate(-3deg)' },
+        }
+      },
+      animation: {
+        "wiggle-left": 'wiggle-left 1s ease-in-out infinite',
+        "wiggle-right": 'wiggle-right 1s ease-in-out infinite'
       }
     },
   },
