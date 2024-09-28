@@ -7,6 +7,10 @@ defmodule LollygaggingWeb.PostLive.FormComponent do
   def render(assigns) do
     ~H"""
     <div>
+      <.header>
+        <%= @title %>
+      </.header>
+
       <.simple_form
         for={@form}
         id="post-form"
@@ -14,6 +18,7 @@ defmodule LollygaggingWeb.PostLive.FormComponent do
         phx-change="validate"
         phx-submit="save"
       >
+        <.input field={@form[:parent_id]} hidden={true} />
         <.input field={@form[:username]} type="text" placeholder="username..." />
         <.input field={@form[:body]} type="textarea" placeholder="write your message..." />
         <:actions>
@@ -41,7 +46,11 @@ defmodule LollygaggingWeb.PostLive.FormComponent do
   end
 
   def handle_event("save", %{"post" => post_params}, socket) do
-    save_post(socket, socket.assigns.action, post_params)
+    save_post(
+      socket,
+      socket.assigns.action,
+      Map.put(post_params, "parent_id", socket.assigns.parent_id)
+    )
   end
 
   defp save_post(socket, :edit, post_params) do
@@ -57,7 +66,7 @@ defmodule LollygaggingWeb.PostLive.FormComponent do
     end
   end
 
-  defp save_post(socket, :new, post_params) do
+  defp save_post(socket, _action, post_params) do
     case Timeline.create_post(post_params) do
       {:ok, post} ->
         Timeline.broadcast(post, :post_created)
