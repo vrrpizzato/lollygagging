@@ -6,6 +6,7 @@ defmodule Lollygagging.Timeline do
   import Ecto.Query, warn: false
   alias Lollygagging.Repo
   alias Lollygagging.Timeline.Post
+  alias Lollygagging.Timeline.Query.Post, as: QueryPost
 
   @doc """
   Returns the list of posts.
@@ -20,9 +21,10 @@ defmodule Lollygagging.Timeline do
     Repo.all(Post)
   end
 
-  def list_posts(order) do
+  def list_posts(criteria) do
     Post
-    |> order_by([p], [{^order, :inserted_at}])
+    |> where(^QueryPost.posts_by_criteria(criteria))
+    |> order_by([p], [{:desc, :inserted_at}])
     |> limit([p], 20)
     |> Repo.all()
   end
@@ -41,7 +43,11 @@ defmodule Lollygagging.Timeline do
       ** (Ecto.NoResultsError)
 
   """
-  def get_post!(id), do: Repo.get!(Post, id)
+  def get_post!(id) do
+    Post
+    |> Repo.get!(id)
+    |> Repo.preload(children: from(p in Post, order_by: [{:desc, :inserted_at}]))
+  end
 
   @doc """
   Creates a post.
@@ -115,7 +121,7 @@ defmodule Lollygagging.Timeline do
       |> select([p], p)
       |> Repo.update_all(inc: [likes_count: 1])
 
-    {:ok, post}
+    {:ok, Repo.preload(post, [:children])}
   end
 
   def subscribe, do: Phoenix.PubSub.subscribe(Lollygagging.PubSub, "posts")
