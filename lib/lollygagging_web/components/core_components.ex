@@ -260,6 +260,7 @@ defmodule LollygaggingWeb.CoreComponents do
   attr :name, :any
   attr :label, :string, default: nil
   attr :value, :any
+  attr :hidden, :boolean, default: false
 
   attr :type, :string,
     default: "text",
@@ -360,6 +361,7 @@ defmodule LollygaggingWeb.CoreComponents do
     <div>
       <.label for={@id}><%= @label %></.label>
       <input
+        :if={!@hidden}
         type={@type}
         name={@name}
         id={@id}
