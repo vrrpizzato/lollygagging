@@ -19,6 +19,7 @@ defmodule LollygaggingWeb.Router do
 
     live "/", PostLive.Index, :index
     live "/posts/new", PostLive.Index, :new
+    live "/posts/:id/new", PostLive.Index, :reply
     live "/posts/:id/edit", PostLive.Index, :edit
 
     live "/posts/:id", PostLive.Show, :show
